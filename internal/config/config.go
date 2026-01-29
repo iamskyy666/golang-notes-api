@@ -16,10 +16,10 @@ type Config struct {
 func Load()(Config, error){
 	// godotenv.Load() - Reads the .env and sets them into the process environment.
 	if err:=godotenv.Load(); err!=nil{
-		return Config{},fmt.Errorf("⚠️ FAILED to load .env! -",err)
+		return Config{},fmt.Errorf("⚠️ FAILED to load .env! - %v",err)
 	} 
 	
-		mongoURI,err:= extractEnv("MONGO_URI")
+		mongoURI,err:= extractEnv("MONGODB_URI")
 		if err != nil {
 			return Config{},err
 		}

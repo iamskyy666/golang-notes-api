@@ -18,13 +18,15 @@ func ConnectDB(cfg config.Config)(*mongo.Client, *mongo.Database,error){
 
 	client,err:=mongo.Connect(ctx, clientOpts)
 	if err != nil {
-		return nil,nil, fmt.Errorf("⚠️ FAILED, connecting MONGODB!")
+		return nil, nil, fmt.Errorf("⚠️ Mongo connect failed: %w", err)
 	}
 
 	// ping method
 	if err:=client.Ping(ctx,nil);err!=nil{
-		return nil,nil,fmt.Errorf("⚠️ Mongo-ping failed!")
+		return nil, nil, fmt.Errorf("⚠️ Mongo ping failed: %w", err)
 	}
+
+	
 
 	database:=client.Database(cfg.MongoDB)
 
