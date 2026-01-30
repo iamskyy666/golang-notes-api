@@ -103,7 +103,7 @@ func (h *Handler) GetNoteById(ctx *gin.Context){
 			return
 		}
 
-		// Geberal-Error
+		// General-Error
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error":"⚠️ Failed to FETCH the note!",
 			"status_code":http.StatusInternalServerError,
@@ -114,5 +114,52 @@ func (h *Handler) GetNoteById(ctx *gin.Context){
 	// If everything is fine.. ✅
 	ctx.JSON(http.StatusOK,note)
 
+}
+
+func (h *Handler) UpdateNoteById(ctx *gin.Context){
+	idStr:=ctx.Param("id")
+	// ObjectIDFromHex creates a new ObjectID from a 24-char hex string. It returns an error if the hex string is not a valid ObjectID.
+	objId,err:=primitive.ObjectIDFromHex(idStr)
+	if err!=nil{
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":"⚠️ Invalid ID!",
+			"status_code":http.StatusBadRequest,
+		})
+		return
+	}
+
+	var req UpdateNoteRequest
+
+	// Extra check
+	if err:=ctx.ShouldBindJSON(&req);err!=nil{
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":"⚠️ Invalid JSON-format!",
+			"status_code":http.StatusBadRequest,
+		})
+		return
+	}
+
+	updatedNote, err:=h.repo.UpdateNote(ctx.Request.Context(),objId,req)
+
+	if err!=nil{
+		// Mongo-Error
+		if errors.Is(err, mongo.ErrNoDocuments){
+			ctx.JSON(http.StatusNotFound, gin.H{
+			"error":"⚠️ Note not found for the given ID!",
+			"status_code":http.StatusNotFound,
+			})
+			return
+		}
+
+		// General-Error
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":"⚠️ Failed to UPDATE the note!",
+			"status_code":http.StatusInternalServerError,
+		})
+		return
+	}
+
+	// If everything is fine.. ✅
+	ctx.JSON(http.StatusOK,updatedNote)
 }
 

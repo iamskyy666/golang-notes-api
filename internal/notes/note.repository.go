@@ -85,3 +85,36 @@ func (r *Repo)FindNote(ctx context.Context, id primitive.ObjectID)(Note, error){
 	return  note,nil
 }
 
+// UpdateById-> Read
+func (r *Repo)UpdateNote(ctx context.Context, id primitive.ObjectID, req UpdateNoteRequest)(Note, error){
+
+	opCtx,cancel:=context.WithTimeout(ctx, 5*time.Second) // opCtx -> child context
+	defer cancel()
+
+	filter:=bson.M{"_id":id} // check model
+
+	update := bson.M{
+		"$set":bson.M{
+			"title":req.Title,
+			"content":req.Content,
+			"pinned":req.Pinned,
+			"updatedAt":time.Now().UTC(),
+		},
+	}
+
+	after:=options.After
+	opts:=options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+	}
+
+	var updatedNote Note
+
+	err:=r.coll.FindOneAndUpdate(opCtx,filter,update,&opts).Decode(&updatedNote)
+
+	if err != nil {
+		return Note{}, fmt.Errorf("⚠️ Failed to UPDATE note: %w",err)
+	}
+
+	// ✅ If all ok, then.. 
+	return updatedNote,nil
+}
