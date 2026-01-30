@@ -3,10 +3,12 @@ package server
 import (
 	"net/http"
 
+	"github.com/callmeskyy111/notes-api/internal/notes"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func NewRouter()*gin.Engine {
+func NewRouter(database *mongo.Database)*gin.Engine {
 	r:=gin.Default()
 
 	r.GET("/health", func(ctx *gin.Context) {
@@ -15,7 +17,8 @@ func NewRouter()*gin.Engine {
 			"status":"healthy ✅",
 		})
 	})
+
+	notes.RegisterRoutes(r,database)
+
 	return r
 }
-
-// 4:30:00

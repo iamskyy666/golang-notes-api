@@ -17,7 +17,7 @@ func main() {
 		log.Fatal("⚠️ Config Error!", err)
 	}
 
-	client,_,err:=db.ConnectDB(cfg)
+	client,database,err:=db.ConnectDB(cfg)
 	if err != nil {
 		log.Fatal("⚠️ DB Error!", err)
 	}
@@ -29,11 +29,9 @@ func main() {
 	}()
 
 	// create router
-	router:=server.NewRouter()
+	router:=server.NewRouter(database)
 	addr:=fmt.Sprintf(":%s",cfg.ServerPort)
 	if err:=router.Run(addr);err!=nil{
 			log.Fatalf("⚠️ Failed to connect to server: %v", err)
 		}
 }
-
-// 04:47:25
