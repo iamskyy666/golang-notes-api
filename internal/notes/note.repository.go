@@ -31,7 +31,7 @@ func (r *Repo)Create(ctx context.Context, note Note)(Note, error){
 	_,err:=r.coll.InsertOne(opCtx,note)
 
 	if err != nil {
-		return Note{},fmt.Errorf("⚠️ Inserting Note Failed!")
+		return Note{},fmt.Errorf("⚠️ Inserting Note Failed: %w",err)
 	}
 	return note,nil
 }
