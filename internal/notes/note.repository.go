@@ -118,3 +118,24 @@ func (r *Repo)UpdateNote(ctx context.Context, id primitive.ObjectID, req UpdateN
 	// ✅ If all ok, then.. 
 	return updatedNote,nil
 }
+
+// DeleteById-> Read
+func (r *Repo)DeleteNote(ctx context.Context, id primitive.ObjectID)(bool, error){
+
+	opCtx,cancel:=context.WithTimeout(ctx, 5*time.Second) // opCtx -> child context
+	defer cancel()
+
+	filter:=bson.M{"_id":id} // check model
+
+	res,err:=r.coll.DeleteOne(opCtx,filter,)
+	if err != nil {
+		return false, fmt.Errorf("⚠️ Failed to DELETE note: %w",err)
+	}
+
+	if(res.DeletedCount==0){
+		return false,nil
+	}
+
+	// ✅ If all ok, then.. 
+	return true,nil
+}	

@@ -163,3 +163,40 @@ func (h *Handler) UpdateNoteById(ctx *gin.Context){
 	ctx.JSON(http.StatusOK,updatedNote)
 }
 
+func (h *Handler) DeleteNoteById(ctx *gin.Context){
+	idStr:=ctx.Param("id")
+	// ObjectIDFromHex creates a new ObjectID from a 24-char hex string. It returns an error if the hex string is not a valid ObjectID.
+	objId,err:=primitive.ObjectIDFromHex(idStr)
+	if err!=nil{
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":"⚠️ Invalid ID!",
+			"status_code":http.StatusBadRequest,
+		})
+		return
+	}
+
+	deletedNote,err:=h.repo.DeleteNote(ctx.Request.Context(),objId)
+
+	if err!=nil{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":"⚠️ Failed to DELETE the note!",
+			"status_code":http.StatusInternalServerError,
+		})
+		return
+	}
+
+	if !deletedNote{
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error":"⚠️ Note not found!",
+			"status_code":http.StatusNotFound,
+		})
+		return
+	}
+	
+	// If everything is fine.. ✅
+	ctx.JSON(http.StatusOK,gin.H{
+		"message":"✅ Note deleted successfully!",
+		"ok":deletedNote,
+	})
+}
+
