@@ -54,3 +54,20 @@ func (h *Handler) CreateNote(ctx *gin.Context){
 	// If everything is OK.. ✅
 	ctx.JSON(http.StatusCreated,createdNote)
 }
+
+
+func (h *Handler) ListNotes(ctx *gin.Context){
+	notes,err:= h.repo.List(ctx.Request.Context())
+	if err!=nil{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":"⚠️ Failed to FETCH all notes!",
+			"status_code":http.StatusInternalServerError,
+		})
+		return
+	}
+	// If everything is OK.. ✅
+	ctx.JSON(http.StatusOK,gin.H{
+		"message":"✅ Fetched all notes!",
+		"notes":notes,
+	})
+}
